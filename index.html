@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" style="background-color: #446FAA1A;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mizogames Feed</title>
+
+    <!-- Material-UI CSS (Replace with the actual link to Material-UI styles) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <style>
+      /* Custom styles for adjusting card display */
+      .custom-card-container {
+        display: flex;
+        flex-wrap: wrap; /* Allow cards to wrap to the next line */
+        justify-content: space-around; /* Optional: Distribute space between cards */
+        align-items: stretch; /* Stretch cards vertically */
+      }
+
+      .custom-card {
+        max-width: 400px; /* Set max-width to 400px */
+        width: calc(100% - 20px); /* Calculate width to fit three cards in a row with margin */
+        margin: 10px; /* Adjust margin for spacing between cards */
+        box-sizing: border-box; /* Include padding and border in the width calculation */
+      }
+
+      /* Media query for larger screens */
+      @media (min-width: 768px) {
+        .custom-card {
+          width: calc(50% - 20px); /* Adjust width for two cards in a row */
+        }
+      }
+
+      /* Media query for even larger screens */
+      @media (min-width: 1200px) {
+        .custom-card {
+          width: calc(25% - 20px); /* Adjust width for four cards in a row */
+        }
+      }
+    </style>
+</head>
+<body>
+
+<!-- Display area for game details -->
+<div id="gameDetails" class="container custom-card-container"></div>
+
+<script>
+  // Fetch data from the provided RSS feed
+  fetch('https://api.allorigins.win/raw?url=https://feeds.feedburner.com/mizogames/new-games')
+    .then(response => response.text())
+    .then(data => {
+      // Parse XML data
+      let parser = new DOMParser();
+      let xmlDoc = parser.parseFromString(data, 'text/xml');
+
+      // Extract all game items
+      let items = xmlDoc.querySelectorAll('item');
+
+      // Create HTML content for each item
+      let gameDetailsHTML = '';
+      items.forEach(item => {
+        let title = item.querySelector('title').textContent;
+        let description = item.querySelector('description').innerHTML; // Use innerHTML to include HTML tags
+        let category = item.querySelector('category').textContent;
+        let pubDate = item.querySelector('pubDate').textContent;
+        let link = item.querySelector('link').textContent;
+        let imageSrc = item.querySelector('enclosure').getAttribute('url');
+
+        // Append Materialize CSS classes for styling
+        gameDetailsHTML += `
+          <div class="card custom-card">
+            <div class="card-content">
+              <span class="card-title">${title}</span>
+              <div>${description}</div>
+              <p>Category: ${category}</p>
+              <p>Publication Date: ${pubDate}</p>
+              <a class="btn" href="${link}" target="_blank">Play Game</a>
+            </div>
+            <div class="card-image">
+              <img src="${imageSrc}" alt="${title}">
+            </div>
+          </div>
+        `;
+      });
+
+      // Display all game details in the specified div
+      document.getElementById('gameDetails').innerHTML = gameDetailsHTML;
+    })
+    .catch(error => console.error('Error fetching data:', error));
+</script>
+
+<!-- Material-UI JavaScript (Replace with the actual link to Material-UI scripts) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+</body>
+</html>
