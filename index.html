@@ -9,12 +9,6 @@
   <!-- Material-UI CSS (Replace with the actual link to Material-UI styles) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500&family=Rubik+Broken+Fax&family=Rubik+Doodle+Triangles&display=swap" rel="stylesheet">
-    
-
-  
   <style>
     /* Custom styles for adjusting card display */
     .custom-card-container {
@@ -79,6 +73,25 @@
         transform: rotate(360deg);
       }
     }
+
+    /* Styling for Material-UI h1 header (added) */
+    h1 {
+      background-color: #333; /* Darker background color */
+      color: #fff;
+      text-align: center;
+      font-size: 36px;
+      margin: 0; /* Remove margin */
+      padding: 10px; /* Add padding for better visibility */
+    }
+
+    /* Styling for search input (modified) */
+    #searchInput {
+      width: 100%;
+      padding: 10px;
+      margin: 0; /* Remove margin */
+      box-sizing: border-box;
+      background-color: #fff; /* Set background color to white */
+    }
   </style>
 </head>
 
@@ -110,10 +123,18 @@
     </div>
   </div>
 
+  <!-- Material-UI h1 header containing the title value (added) -->
+  <h1>Mizogames Feed</h1>
+
+  <!-- Search input (modified) -->
+  <input type="text" id="searchInput" placeholder="Search by title..." oninput="filterGames()">
+
   <!-- Display area for game details -->
   <div id="gameDetails" class="container custom-card-container"></div>
 
   <script>
+    let allGames = []; // Variable to store all games
+
     // Fetch data from the provided RSS feed
     fetch('https://api.allorigins.win/raw?url=https://feeds.feedburner.com/mizogames/new-games')
       .then(response => response.text())
@@ -123,42 +144,59 @@
         let xmlDoc = parser.parseFromString(data, 'text/xml');
 
         // Extract all game items
-        let items = xmlDoc.querySelectorAll('item');
+        allGames = Array.from(xmlDoc.querySelectorAll('item'));
 
-        // Create HTML content for each item
-        let gameDetailsHTML = '';
-        items.forEach(item => {
-          let title = item.querySelector('title').textContent;
-          let description = item.querySelector('description').innerHTML; // Use innerHTML to include HTML tags
-          let category = item.querySelector('category').textContent;
-          let pubDate = item.querySelector('pubDate').textContent;
-          let link = item.querySelector('link').textContent;
-          let imageSrc = item.querySelector('enclosure').getAttribute('url');
-
-          // Append Materialize CSS classes for styling
-          gameDetailsHTML += `
-            <div class="card custom-card">
-              <div class="card-content">
-                <span class="card-title">${title}</span>
-                <div>${description}</div>
-                <p>Category: ${category}</p>
-                <p>Publication Date: ${pubDate}</p>
-                <a class="btn" href="${link}" target="_blank">Play Game</a>
-              </div>
-              <div class="card-image">
-                <img src="${imageSrc}" alt="${title}">
-              </div>
-            </div>
-          `;
-        });
-
-        // Display all game details in the specified div
-        document.getElementById('gameDetails').innerHTML = gameDetailsHTML;
+        // Display all games initially
+        displayGames(allGames);
 
         // Hide loading container after content is loaded (added)
         document.getElementById('loadingContainer').style.display = 'none';
       })
       .catch(error => console.error('Error fetching data:', error));
+
+    // Function to display games based on the provided list
+    function displayGames(games) {
+      let gameDetailsHTML = '';
+
+      // Create HTML content for each game
+      games.forEach(item => {
+        let title = item.querySelector('title').textContent;
+        let description = item.querySelector('description').innerHTML; // Use innerHTML to include HTML tags
+        let category = item.querySelector('category').textContent;
+        let pubDate = item.querySelector('pubDate').textContent;
+        let link = item.querySelector('link').textContent;
+        let imageSrc = item.querySelector('enclosure').getAttribute('url');
+
+        // Append Materialize CSS classes for styling
+        gameDetailsHTML += `
+          <div class="card custom-card">
+            <div class="card-content">
+              <span class="card-title">${title}</span>
+              <div>${description}</div>
+              <p>Category: ${category}</p>
+              <p>Publication Date: ${pubDate}</p>
+              <a class="btn" href="${link}" target="_blank">Play Game</a>
+            </div>
+            <div class="card-image">
+              <img src="${imageSrc}" alt="${title}">
+            </div>
+          </div>
+        `;
+      });
+
+      // Display all game details in the specified div
+      document.getElementById('gameDetails').innerHTML = gameDetailsHTML;
+    }
+
+    // Function to filter games based on the search input
+    function filterGames() {
+      const searchInput = document.getElementById('searchInput').value.toLowerCase();
+      const filteredGames = allGames.filter(item =>
+        item.querySelector('title').textContent.toLowerCase().includes(searchInput)
+      );
+
+      displayGames(filteredGames);
+    }
   </script>
 
   <!-- Material-UI JavaScript (Replace with the actual link to Material-UI scripts) -->
