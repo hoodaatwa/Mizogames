@@ -96,6 +96,11 @@
 </head>
 
 <body>
+<!-- Material-UI h1 header containing the title value (added) -->
+  <h1>Mizogames Feed</h1>
+
+  <!-- Search input (modified) -->
+  <input type="text" id="searchInput" placeholder="Search by title..." oninput="filterGames()">
 
   <!-- Loading container with CircularProgress -->
   <div id="loadingContainer">
@@ -123,12 +128,7 @@
     </div>
   </div>
 
-  <!-- Material-UI h1 header containing the title value (added) -->
-  <h1>Mizogames Feed</h1>
-
-  <!-- Search input (modified) -->
-  <input type="text" id="searchInput" placeholder="Search by title..." oninput="filterGames()">
-
+  
   <!-- Display area for game details -->
   <div id="gameDetails" class="container custom-card-container"></div>
 
